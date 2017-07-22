@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.center.dao.StudentDao">
+	<resultMap id="BaseResultMap" type="Student">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="CHAR" />
+		<result column="birthday" property="birthday" jdbcType="TIMESTAMP" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, name, sex, birthday, address, email
+	</sql>
+
+	<select id="getStudentById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from student
+		where id = #{id,jdbcType=BIGINT}
+	</select>
+
+	<select id="getAll" resultType="Student">
+		select
+		<include refid="Base_Column_List" />
+		from student
+	</select>
+
+	<insert id="addStudent" parameterType="Student">
+		insert into student (id, name, sex, birthday,
+		address, email)
+		values (#{id,jdbcType=BIGINT},
+		#{name,jdbcType=VARCHAR}, #{sex,jdbcType=CHAR}, #{birthday,jdbcType=TIMESTAMP},
+		#{address,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateStudent" parameterType="Student">
+		update student
+		<set>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				sex = #{sex,jdbcType=CHAR},
+			</if>
+			<if test="birthday != null">
+				birthday = #{birthday,jdbcType=TIMESTAMP},
+			</if>
+			<if test="address != null">
+				address = #{address,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null">
+				email = #{email,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<delete id="deleteStudentByIds" parameterType="java.lang.Long">
+		delete from student
+		where id in
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id,jdbcType=BIGINT}
+		</foreach>
+	</delete>
+
+</mapper>
