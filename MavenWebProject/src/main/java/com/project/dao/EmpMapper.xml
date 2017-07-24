@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="interface.EmpMapper" >
+    <resultMap id="BaseResultMap" type="pojo.Emp" >
+        <id column="EMPNO" property="empno" jdbcType="INTEGER" />
+        <result column="ENAME" property="ename" jdbcType="VARCHAR" />
+        <result column="JOB" property="job" jdbcType="VARCHAR" />
+        <result column="MGR" property="mgr" jdbcType="BIGINT" />
+        <result column="HIREDATE" property="hiredate" jdbcType="DATE" />
+        <result column="SAL" property="sal" jdbcType="DECIMAL" />
+        <result column="COMM" property="comm" jdbcType="DECIMAL" />
+        <result column="DEPTNO" property="deptno" jdbcType="SMALLINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select 
+        <include refid="Base_Column_List" />
+        from emp
+        where EMPNO = #{empno,jdbcType=INTEGER}
+    </select>
+
+    <insert id="insert" parameterType="pojo.Emp" >
+        insert into emp (EMPNO, ENAME, JOB, 
+            MGR, HIREDATE, SAL, COMM, 
+            DEPTNO)
+        values (#{empno,jdbcType=INTEGER}, #{ename,jdbcType=VARCHAR}, #{job,jdbcType=VARCHAR}, 
+            #{mgr,jdbcType=BIGINT}, #{hiredate,jdbcType=DATE}, #{sal,jdbcType=DECIMAL}, #{comm,jdbcType=DECIMAL}, 
+            #{deptno,jdbcType=SMALLINT})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="pojo.Emp" >
+        update emp
+        <set >
+            <if test="ename != null" >
+                ENAME = #{ename,jdbcType=VARCHAR},
+            </if>
+            <if test="job != null" >
+                JOB = #{job,jdbcType=VARCHAR},
+            </if>
+            <if test="mgr != null" >
+                MGR = #{mgr,jdbcType=BIGINT},
+            </if>
+            <if test="hiredate != null" >
+                HIREDATE = #{hiredate,jdbcType=DATE},
+            </if>
+            <if test="sal != null" >
+                SAL = #{sal,jdbcType=DECIMAL},
+            </if>
+            <if test="comm != null" >
+                COMM = #{comm,jdbcType=DECIMAL},
+            </if>
+            <if test="deptno != null" >
+                DEPTNO = #{deptno,jdbcType=SMALLINT},
+            </if>
+        </set>
+        where EMPNO = #{empno,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+        delete from emp
+        where EMPNO = #{empno,jdbcType=INTEGER}
+    </delete>
+
+</mapper>

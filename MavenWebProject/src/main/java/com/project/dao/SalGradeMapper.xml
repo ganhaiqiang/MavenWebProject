@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="interface.SalGradeMapper" >
+    <resultMap id="BaseResultMap" type="pojo.SalGrade" >
+        <result column="GRADE" property="grade" jdbcType="INTEGER" />
+        <result column="LOSAL" property="losal" jdbcType="INTEGER" />
+        <result column="HISAL" property="hisal" jdbcType="INTEGER" />
+    </resultMap>
+
+    <insert id="insert" parameterType="pojo.SalGrade" >
+        insert into salgrade (GRADE, LOSAL, HISAL
+            )
+        values (#{grade,jdbcType=INTEGER}, #{losal,jdbcType=INTEGER}, #{hisal,jdbcType=INTEGER}
+            )
+    </insert>
+
+</mapper>
