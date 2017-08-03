@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="interface.EmpMapper" >
-    <resultMap id="BaseResultMap" type="pojo.Emp" >
+<mapper namespace="com.project.dao.EmpMapper" >
+    <resultMap id="BaseResultMap" type="com.project.entity.Emp" >
         <id column="EMPNO" property="empno" jdbcType="INTEGER" />
         <result column="ENAME" property="ename" jdbcType="VARCHAR" />
         <result column="JOB" property="job" jdbcType="VARCHAR" />
@@ -23,7 +23,7 @@
         where EMPNO = #{empno,jdbcType=INTEGER}
     </select>
 
-    <insert id="insert" parameterType="pojo.Emp" >
+    <insert id="insert" parameterType="com.project.entity.Emp" >
         insert into emp (EMPNO, ENAME, JOB, 
             MGR, HIREDATE, SAL, COMM, 
             DEPTNO)
@@ -32,7 +32,7 @@
             #{deptno,jdbcType=SMALLINT})
     </insert>
 
-    <update id="updateByPrimaryKeySelective" parameterType="pojo.Emp" >
+    <update id="updateByPrimaryKeySelective" parameterType="com.project.entity.Emp" >
         update emp
         <set >
             <if test="ename != null" >

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.center.dao.StudentDao">
-	<resultMap id="BaseResultMap" type="Student">
+<mapper namespace="com.project.dao.StudentDao">
+	<resultMap id="BaseResultMap" type="com.project.entity.Student">
 		<id column="id" property="id" jdbcType="BIGINT" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="sex" property="sex" jdbcType="CHAR" />
@@ -21,13 +21,13 @@
 		where id = #{id,jdbcType=BIGINT}
 	</select>
 
-	<select id="getAll" resultType="Student">
+	<select id="getAll" resultType="com.project.entity.Student">
 		select
 		<include refid="Base_Column_List" />
 		from student
 	</select>
 
-	<insert id="addStudent" parameterType="Student">
+	<insert id="addStudent" parameterType="com.project.entity.Student">
 		insert into student (id, name, sex, birthday,
 		address, email)
 		values (#{id,jdbcType=BIGINT},
@@ -35,7 +35,7 @@
 		#{address,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR})
 	</insert>
 
-	<update id="updateStudent" parameterType="Student">
+	<update id="updateStudent" parameterType="com.project.entity.Student">
 		update student
 		<set>
 			<if test="name != null">
