@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="interface.DeptMapper" >
-    <resultMap id="BaseResultMap" type="pojo.Dept" >
+<mapper namespace="com.demo.dao.DeptMapper" >
+    <resultMap id="BaseResultMap" type="com.demo.entity.Dept" >
         <id column="DEPTNO" property="deptno" jdbcType="BIGINT" />
         <result column="DNAME" property="dname" jdbcType="VARCHAR" />
         <result column="LOC" property="loc" jdbcType="VARCHAR" />
@@ -18,14 +18,14 @@
         where DEPTNO = #{deptno,jdbcType=BIGINT}
     </select>
 
-    <insert id="insert" parameterType="pojo.Dept" >
+    <insert id="insert" parameterType="com.demo.entity.Dept" >
         insert into dept (DEPTNO, DNAME, LOC
             )
         values (#{deptno,jdbcType=BIGINT}, #{dname,jdbcType=VARCHAR}, #{loc,jdbcType=VARCHAR}
             )
     </insert>
 
-    <update id="updateByPrimaryKeySelective" parameterType="pojo.Dept" >
+    <update id="updateByPrimaryKeySelective" parameterType="com.demo.entity.Dept" >
         update dept
         <set >
             <if test="dname != null" >
