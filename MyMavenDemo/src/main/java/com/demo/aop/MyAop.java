@@ -10,19 +10,14 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSON;
-import com.demo.service.StudentService;
 
 //@Aspect
 //@Component
 public class MyAop {
-
-	@Autowired
-	private StudentService studentService;
 
 	/**
 	 * Pointcut 定义Pointcut，Pointcut的名称为aspectjMethod()，此方法没有返回值和参数
@@ -88,7 +83,6 @@ public class MyAop {
 			map.put(entry.getKey(), entry.getValue()[0]);
 		}
 		System.out.println(JSON.toJSONString(map, true));
-		System.out.println("????????" + studentService.getCount());
 		System.out.println(" 此处可以做类似于Before Advice的事情");
 		System.out.println("methed:" + pjp.getTarget().toString() + "args:" + JSON.toJSONString(pjp.getArgs()));
 

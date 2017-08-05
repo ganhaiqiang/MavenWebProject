@@ -49,8 +49,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 import com.demo.excel.ViewExcel;
 import com.demo.pojo.Student;
-import com.demo.service.RecordsService;
-import com.demo.service.StudentService;
 import com.demo.utils.FreeMarkerUtils;
 import com.demo.utils.PropertieUtils;
 import com.demo.utils.PropertiesUtil;
@@ -68,10 +66,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
 @RequestMapping(value = "/stu")
 public class DemoController {
 	private static final Logger LOGGER = Logger.getLogger(DemoController.class);
-	@Autowired
-	private StudentService studentService;
-	@Autowired
-	private RecordsService recordsService;
 	@Autowired
 	private MessageSource messageSource;
 
@@ -212,68 +206,6 @@ public class DemoController {
 		return value;
 	}
 
-	@RequestMapping(value = "/getByTable", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getByTable(String column, String tableName) {
-		// Map<String, Object> parMap=new HashMap<String, Object>();
-		// parMap.put("table",tableName);
-		List<Map<String, Object>> list = studentService.getByTable(tableName);
-		System.out.println(JSON.toJSONString(list, true));
-		return list;
-	}
-
-	@RequestMapping(value = "/getStuPicList", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getStuPicList(ModelMap model) {
-		Student student = new Student();
-		student.setId(7);
-		List<Student> list = studentService.getStuPicList(student);
-		System.out.println(JSON.toJSONString(list, true));
-		return list;
-	}
-
-	@RequestMapping(value = "/insertStudentByMap", method = RequestMethod.GET)
-	@ResponseBody
-	public Object insertStudentByMap() {
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		// Map<String, Object> map1=new HashMap<String, Object>();
-		// map1.put("ID", 3000);
-		// map1.put("NAME", "测试人员3");
-		// map1.put("SEX", "女");
-		// map1.put("AGE", 21);
-		// map1.put("PHONE", "13428713007");
-		// map1.put("ADDRESS", "内蒙古呼和浩特");
-		// map1.put("PICTURE", "呵.jpg");
-		// Map<String, Object> map2=new HashMap<String, Object>();
-		// map2.put("ID", 4000);
-		// map2.put("NAME", "测试人员4");
-		// map2.put("SEX", "男");
-		// map2.put("AGE", 29);
-		// map2.put("PHONE", "13428713007");
-		// map2.put("ADDRESS", "湖北房县");
-		// map2.put("PICTURE", "不懂");
-		// list.add(map1);
-		// list.add(map2);
-		int i = studentService.insertStudentByMap(list);
-		return i;
-	}
-
-	@RequestMapping(value = "/delMemUsers", method = RequestMethod.GET)
-	@ResponseBody
-	public Object delMemUsers(ModelMap model) {
-		int i = studentService.delMemUsers();
-		return i;
-	}
-
-	@RequestMapping(value = "/getStuPic", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getStuPic(ModelMap model) {
-		System.out.println("查数据库。。。。");
-		List<Student> list = studentService.getStuPic();
-		System.out.println(JSON.toJSONString(list, true));
-		return list;
-	}
-
 	@RequestMapping(value = "/excel", method = RequestMethod.GET)
 	public ModelAndView downExcel(ModelMap model) {
 		// Student student=new Student();
@@ -289,21 +221,6 @@ public class DemoController {
 
 		System.out.println(PropertiesUtil.getProperty("jdbc.url"));
 		return null;
-	}
-
-	@RequestMapping(value = "/add", method = RequestMethod.GET)
-	@ResponseBody
-	public Object addStu() {
-		Student student = new Student();
-		student.setId(new Random().nextInt(1000));
-		student.setAddress("湖北武汉");
-		student.setAge(25D);
-		student.setName("康有为");
-		student.setPhone("15842365541");
-		student.setPicture("abcefc");
-		student.setSex("男");
-		studentService.insertStudent(student);
-		return "done";
 	}
 
 	@RequestMapping(value = "/getSession", method = RequestMethod.GET)
@@ -432,27 +349,6 @@ public class DemoController {
 		return map;
 	}
 
-	@RequestMapping(value = "/getAll", method = RequestMethod.GET)
-	@ResponseBody
-	public Object getAll() {
-		String name = "曹操";
-		String phone = "16336221361";
-		List list = studentService.getAll();
-		System.out.println(list == null);
-		System.out.println(list.size());
-		return list;
-	}
-
-	@RequestMapping(value = "/getStu", method = RequestMethod.GET)
-	@ResponseBody
-	public List<Map<String, Object>> getStuByCondition() {
-		String name = "曹操";
-		String phone = "16336221361";
-		List<Map<String, Object>> list = studentService.getStuByCondition(name, phone);
-		System.out.println(JSON.toJSONString(list));
-		return list;
-	}
-
 	@RequestMapping(value = "/getAjaxForm", method = RequestMethod.POST)
 	@ResponseBody
 	public String getAjaxForm(HttpServletRequest request) {
@@ -468,12 +364,6 @@ public class DemoController {
 			System.out.println(sEntry.getKey() + "==>" + sEntry.getValue());
 		}
 		return JSON.toJSONString(map);
-	}
-
-	@RequestMapping("/getById")
-	@ResponseBody
-	public Object getById(HttpServletRequest request, HttpServletResponse response) {
-		return studentService.getById(5);
 	}
 
 	@RequestMapping("/excel")
@@ -522,24 +412,24 @@ public class DemoController {
 		String sord = request.getParameter("sord");
 		String sex = request.getParameter("sex");
 		/************************************************************************/
-		long count = studentService.getCount();
-		long pageSize = Integer.valueOf(rows);
-		long total = count % pageSize == 0 ? count / pageSize : count / pageSize + 1;
-		long pageNo = Integer.valueOf(page);
-		pageNo = pageNo > total ? total : pageNo;
-		long pageStart = pageSize * (pageNo - 1);
-		LOGGER.info("数据总数：" + count + "，页面条数：" + pageSize + "，总页数：" + total + "，当前页码：" + pageNo);
 		Map map = new HashedMap();
-		map.put("pageSize", pageSize);
-		map.put("pageStart", pageStart);
-		map.put("sidx", sidx);
-		map.put("sord", sord);
-		map.put("sex", sex);
-		List list = studentService.getByPage(map);
-		map.put("page", pageNo);
-		map.put("total", total);
-		map.put("records", count);
-		map.put("rows", list);
+//		long count = studentService.getCount();
+//		long pageSize = Integer.valueOf(rows);
+//		long total = count % pageSize == 0 ? count / pageSize : count / pageSize + 1;
+//		long pageNo = Integer.valueOf(page);
+//		pageNo = pageNo > total ? total : pageNo;
+//		long pageStart = pageSize * (pageNo - 1);
+//		LOGGER.info("数据总数：" + count + "，页面条数：" + pageSize + "，总页数：" + total + "，当前页码：" + pageNo);
+//		map.put("pageSize", pageSize);
+//		map.put("pageStart", pageStart);
+//		map.put("sidx", sidx);
+//		map.put("sord", sord);
+//		map.put("sex", sex);
+//		List list = studentService.getByPage(map);
+//		map.put("page", pageNo);
+//		map.put("total", total);
+//		map.put("records", count);
+//		map.put("rows", list);
 		return map;
 	}
 
