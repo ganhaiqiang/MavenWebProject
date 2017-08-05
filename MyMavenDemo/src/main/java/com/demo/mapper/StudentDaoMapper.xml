@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.demo.dao.StudentDao">
+	<insert id="insertStudent">
+		insert into student values(#{id},#{name},#{sex},#{age},#{phone},#{address},#{picture})
+	</insert>
+	
+	<insert id="insertStudentByMap" parameterType="java.util.List">
+		insert into student
+		<foreach collection="list" item="item" separator="union all">
+			(select
+			#{item.ID}, #{item.NAME}, #{item.SEX},
+			#{item.AGE},#{item.PHONE},#{item.ADDRESS},#{item.PICTURE}
+			from dual)
+		</foreach>
+	</insert>
+	
+	<delete id="delMemUsers">
+		truncate table mem_users
+	</delete>
+
+	<select id="getByTable" resultType="map">
+		select * from ${table}
+	</select>
+
+	<select id="getRows" resultType="int">
+		select count(*) from student
+	</select>
+
+	<select id="getAllMap" resultType="Student">
+		select * from student
+	</select>
+
+	<select id="getAll" resultType="Student">
+		select * from student
+	</select>
+
+	<select id="getById" parameterType="int" resultType="Student">
+		select *
+		from student where id=#{sid}
+	</select>
+
+	<select id="getStuByCondition" resultType="map">
+		select *
+		from student t where t.name=#{name,jdbcType=VARCHAR} and t.phone=#{phone,jdbcType=VARCHAR}
+	</select>
+
+	<select id="getCount" resultType="long">
+		select count(1) from student
+	</select>
+
+	<select id="getByPage" parameterType="map" resultType="Student">
+		select id,name,sex,age,phone,address,picture from student
+		<where>
+			<if test="sex != null and sex !=''">
+				sex=#{sex,jdbcType=VARCHAR}
+			</if>
+		</where>
+		<if test="sidx!=null and sidx!=''">
+			order by #{sidx}
+		</if>
+		<if test="sord!=null and sord!=''">
+			#{sord}
+		</if>
+		limit #{pageSize} offset #{pageStart}
+	</select>
+
+	<select id="getStuPic" resultMap="studentPic">
+		select t.id,
+				t.name,
+				t.sex,
+				t.age,
+				t.phone,
+				t.address,
+				t.id studentId,
+				t.picture,
+				s.id as sid,
+				s.student_id,
+				s.subject,
+				s.score
+		from student t
+		left outer join subject s on s.student_id=t.id
+	</select>
+	
+	<resultMap type="Student" id="studentPic">
+		  <id property="id" column="id" />
+		  <result property="name" column="name"/>
+		  <result property="sex" column="sex"/>
+		  <result property="age" column="age"/>
+		  <result property="phone" column="phone"/>
+		  <result property="address" column="address"/>
+		  <association property="pic" javaType="com.demo.pojo.Picture">
+		    <id property="studentId" column="studentId"/>
+		    <result property="picture" column="picture"/>
+		  </association>
+		  <collection property="subjects" ofType="com.demo.pojo.Subject">
+		    <id property="id" column="sid"/>
+		    <result property="studentId" column="student_id"/>
+		    <result property="subject" column="subject"/>
+		    <result property="score" column="score"/>
+		  </collection>
+	</resultMap>
+
+	<select id="getStuPicList" resultMap="studentPicList" parameterType="com.demo.pojo.Student">
+		select t.id,
+				t.name,
+				t.sex,
+				t.age,
+				t.phone,
+				t.address,
+				t.id studentId,
+				t.picture
+		from student t where t.id=#{id}
+	</select>
+	<select id="selectSubjects" resultType="com.demo.pojo.Subject" parameterType="com.demo.pojo.Student">
+		select s.id as sid,
+				s.student_id,
+				s.subject,
+				s.score
+		from subject s where s.student_id=#{id}
+	</select>
+	
+	<resultMap type="Student" id="studentPicList">
+		  <id property="id" column="id" />
+		  <result property="name" column="name"/>
+		  <result property="sex" column="sex"/>
+		  <result property="age" column="age"/>
+		  <result property="phone" column="phone"/>
+		  <result property="address" column="address"/>
+		  <association property="pic" javaType="com.demo.pojo.Picture">
+		    <id property="studentId" column="studentId"/>
+		    <result property="picture" column="picture"/>
+		  </association>
+		  <collection property="subjects" column="id" ofType="com.demo.pojo.Subject" select="selectSubjects"/>
+	</resultMap>
+</mapper>

@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+	xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
+     http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+
+	<!-- <bean id="insideWarConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> <property name="order" value="1" 
+		/> <property name="ignoreUnresolvablePlaceholders" value="true" /> <property name="locations"> <list> <value>classpath:project.properties</value> 
+		</list> </property> </bean> -->
+
+	<context:component-scan base-package="com.demo" />
+	<aop:aspectj-autoproxy />
+	<context:property-placeholder location="classpath:*.properties" />
+
+	<ehcache:annotation-driven cache-manager="ehCacheManager" />
+
+	<bean id="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:ehcache.xml" />
+	</bean>
+
+	<bean id="casUrl" class="java.lang.String">
+		<constructor-arg value="#{systemEnvironment['cas-url']?:'不存在'}"></constructor-arg>
+	</bean>
+	<bean id="str" class="java.lang.String">
+		<constructor-arg value="#{T(java.lang.Math).PI}"></constructor-arg>
+	</bean>
+	<bean id="str2" class="java.lang.String">
+		<constructor-arg value="#{systemEnvironment['aaa_HOME']?:'不存在'}"></constructor-arg>
+	</bean>
+	<bean id="str3" class="java.lang.String">
+		<constructor-arg value="#{systemProperties['user.dir']?:'不存在'}"></constructor-arg>
+	</bean>
+
+	<!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean"> <property name="jndiName" value="java:comp/env/jndi/MysqlDS" 
+		/> <property name="resourceRef" value="true" /> </bean> -->
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="driverClassName" value="${jdbc.driverClassName}"></property>
+		<!-- <property name="initialSize" value="${connection.initialSize}"></property> -->
+		<!-- <property name="maxActive" value="${connection.maxActive}"></property> <property name="maxIdle" value="${connection.maxIdle}"></property> 
+			<property name="minIdle" value="${connection.minIdle}"></property> <property name="maxWait" value="${connection.maxWait}"></property> <property 
+			name="removeAbandoned" value="${connection.removeAbandoned}"></property> <property name="removeAbandonedTimeout" value="${connection.removeAbandonedTimeout}"></property> 
+			<property name="logAbandoned" value="${connection.logAbandoned}"></property> -->
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+		<property name="globalRollbackOnParticipationFailure" value="false" />
+	</bean>
+
+	<tx:advice id="txadvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="tx_*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="create*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="modify*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="remove*" propagation="REQUIRED" />
+			<tx:method name="change*" propagation="REQUIRED" />
+			<tx:method name="*" read-only="true" propagation="SUPPORTS" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- log4jdbc日志框架 -->
+	<bean id="log4jdbcInterceptor" class="net.sf.log4jdbc.DataSourceSpyInterceptor" />
+	<bean id="dataSourceLog4jdbcAutoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="interceptorNames">
+			<list>
+				<value>log4jdbcInterceptor</value>
+			</list>
+		</property>
+		<property name="beanNames">
+			<list>
+				<value>dataSource</value>
+			</list>
+		</property>
+	</bean>
+
+	<aop:config>
+		<aop:pointcut id="transactionPointcut" expression="execution(* com.demo.service.impl.*.*(..))" />
+		<aop:advisor advice-ref="txadvice" pointcut-ref="transactionPointcut" />
+	</aop:config>
+
+	<!-- enable autowire -->
+	<context:annotation-config />
+
+	<!-- enable transaction demarcation with annotations -->
+	<tx:annotation-driven />
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<tx:annotation-driven mode="aspectj" />
+
+	<!-- define the SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeAliasesPackage" value="com.demo.pojo" />
+		<!-- <property name="configLocation" value="classpath:mybatis-conf.xml" /> -->
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:com/demo/mapper/*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- scan for mappers and let them be autowired -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.demo.dao" />
+	</bean>
+
+
+	<!--事务模板 -->
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager">
+			<ref local="transactionManager" />
+		</property>
+		<!--ISOLATION_DEFAULT 表示由使用的数据库决定 -->
+		<property name="isolationLevelName" value="ISOLATION_DEFAULT" />
+		<property name="propagationBehaviorName" value="PROPAGATION_REQUIRES_NEW" />
+	</bean>
+
+	<import resource="classpath:redis-context.xml" />
+	<!-- <import resource="classpath:springTask.xml" /> -->
+
+	<bean class="com.demo.utils.SpringBeanHelper"></bean>
+
+	<bean id="stu" class="com.demo.pojo.Student">
+		<property name="id" value="101010101"></property>
+		<property name="name" value="甘海强"></property>
+		<property name="sex" value="男"></property>
+		<property name="age" value="28"></property>
+		<property name="phone" value="13428713007"></property>
+		<property name="address" value="广东深圳市"></property>
+		<property name="picture" value="222.jpg"></property>
+	</bean>
+
+	<!-- Freemarker配置 -->
+	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/WEB-INF/ftl/" />
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="template_update_delay">0</prop>
+				<prop key="default_encoding">UTF-8</prop>
+				<prop key="number_format">0.##########</prop>
+				<prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+				<prop key="classic_compatible">true</prop>
+				<prop key="template_exception_handler">ignore</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- <bean id="ParamValidationAOP" class="com.demo.aop.MyAop" /> <aop:config> <aop:aspect id="webParamValidationAspect" ref="ParamValidationAOP" 
+		> <aop:pointcut id="webParamValidationPointCut" expression="execution(* com.demo.controller.ParamController.*(..))" /> <aop:around method="aroundAdvice" 
+		pointcut-ref="webParamValidationPointCut" /> -->
+	<!-- <aop:before method="beforeAdvice" pointcut-ref="webParamValidationPointCut" /> -->
+	<!-- </aop:aspect> </aop:config> -->
+
+	<!-- 文件变动监听器 -->
+	<bean id="ContextFileListener" class="com.demo.listener.ContextFileListener" />
+	<bean id="fileListener" class="com.demo.listener.FileListener" />
+	<bean id="fileMonitor" class="com.demo.listener.FileMonitor">
+		<property name="alterationListener" ref="fileListener" />
+		<property name="filePath" value="E:/TEST" />
+	</bean>
+
+	<!-- Spring容器启动完毕监听 -->
+	<bean class="com.demo.listener.BeanPostProcessor" />
+
+	<!-- 异步线程池 -->
+	<bean id="threadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 核心线程数 -->
+		<property name="corePoolSize" value="3" />
+		<!-- 最大线程数 -->
+		<property name="maxPoolSize" value="10" />
+		<!-- 队列最大长度 >=mainExecutor.maxSize -->
+		<property name="queueCapacity" value="25" />
+		<!-- 线程池维护线程所允许的空闲时间 -->
+		<property name="keepAliveSeconds" value="300" />
+		<!-- 线程池对拒绝任务(无线程可用)的处理策略 ThreadPoolExecutor.CallerRunsPolicy策略 ,调用者的线程会执行该任务,如果执行器已关闭,则丢弃. -->
+		<property name="rejectedExecutionHandler">
+			<bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+		</property>
+	</bean>
+
+	<!-- <import resource="spring-async.xml" /> -->
+	<!-- <import resource="quartz.xml" /> -->
+	<!-- <import resource="kafka-consumer.xml"/> -->
+	<!-- <import resource="kafka-producer.xml"/> -->
+</beans>

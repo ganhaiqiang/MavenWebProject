@@ -46,14 +46,13 @@ function InitLeftMenu() {
 			menulist += '<li><div><a ref="'+o.menuid+'" href="#" rel="' + o.url + '" ><span class="icon '+o.icon+'" >&nbsp;</span><span class="nav">' + o.menuname + '</span></a></div></li> ';
         })
 		menulist += '</ul>';
-        alert(menulist);
 		$('#nav').accordion('add', {
             title: n.menuname,
             content: menulist,
             iconCls: 'icon ' + n.icon
         });
-
     });
+    
 
 	$('.easyui-accordion li a').click(function(){
 		var tabTitle = $(this).children('.nav').text();
