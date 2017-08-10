@@ -1,6 +1,4 @@
 <%@page import="com.demo.pojo.Records"%>
-<%@page import="com.demo.service.RecordsService"%>
-<%@page import="com.demo.service.StudentService"%>
 <%@page import="com.demo.pojo.Student"%>
 <%@page import="java.util.List"%>
 <%@page import="org.apache.ibatis.session.SqlSession"%>
@@ -101,13 +99,6 @@
 	<br />
 	<a href="${pageContext.request.contextPath}/service/stu/getById">ID为5</a>
 	<br />
-	<%
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring-beans.xml");
-	%>
-	<%
-		RecordsService recordsService = (RecordsService) ctx.getBean("recordsService");
-		List reList = recordsService.getAll();
-	%>
 	<table id="tab" style="border: 2px solid #444; border-collapse: collapse;">
 		<tr>
 			<td>ID</td>
@@ -115,19 +106,6 @@
 			<td>图书编号</td>
 			<td>借出日期</td>
 		</tr>
-		<%
-			for (int i = 0; i < reList.size(); i++) {
-				Records records = (Records) reList.get(i);
-		%>
-		<tr>
-			<td><%=records.getId()%></td>
-			<td><%=records.getBookName()%></td>
-			<td><%=records.getBookNo()%></td>
-			<td><%=records.getLendDate()%></td>
-		</tr>
-		<%
-			}
-		%>
 	</table>
 	<hr>
 	<input type="button" id="query" value="查询" />
