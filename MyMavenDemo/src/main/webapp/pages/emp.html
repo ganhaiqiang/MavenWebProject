@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>员工信息列表</title>
+<!-- <link rel="stylesheet" type="text/css" href="../css/default.css" /> -->
+<link rel="stylesheet" type="text/css" href="../js/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css" href="../js/themes/icon.css" />
+<script type="text/javascript" src="../js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="../js/jquery.easyui.min.1.2.2.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$(window).resize(function() {
+			$('#emp_list').datagrid('resize', {
+				width : $(window).width() - 10,
+				height : $(window).height() - 35
+			}).datagrid('resize', {
+				width : $(window).width() - 10,
+				height : $(window).height() - 35
+			});
+		});
+
+	});
+</script>
+</head>
+<body>
+	<div id="tb" style="padding: 5px; height: auto">
+		<div style="margin-bottom: 5px">
+			<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"></a> <a href="#" class="easyui-linkbutton"
+				iconCls="icon-edit" plain="true"></a> <a href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true"></a> <a
+				href="#" class="easyui-linkbutton" iconCls="icon-cut" plain="true"></a> <a href="#" class="easyui-linkbutton"
+				iconCls="icon-remove" plain="true"></a>
+		</div>
+		<div>
+			Date From: <input class="easyui-datebox" style="width: 80px"> To: <input class="easyui-datebox"
+				style="width: 80px"> Language: <input class="easyui-combobox" style="width: 100px"
+				url="data/combobox_data.json" valueField="id" textField="text"> <a href="#" class="easyui-linkbutton"
+				iconCls="icon-search">Search</a>
+		</div>
+	</div>
+	<table id="emp_list" class="easyui-datagrid" style="width: $(window).width() - 10; height: $(window).height() - 35" url="data/datagrid"
+		title="DataGrid - Complex Toolbar" toolbar="#tb" singleSelect="true" fitColumns="true">
+		<thead>
+			<tr>
+				<th field="itemid" width="60">Item ID</th>
+				<th field="productid" width="80">Product ID</th>
+				<th field="listprice" align="right" width="70">List Price</th>
+				<th field="unitcost" align="right" width="70">Unit Cost</th>
+				<th field="attr1" width="200">Address</th>
+				<th field="status" width="50">Status</th>
+			</tr>
+		</thead>
+	</table>
+</body>
+</html>
