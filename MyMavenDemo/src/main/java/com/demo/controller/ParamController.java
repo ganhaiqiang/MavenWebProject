@@ -21,7 +21,7 @@ import com.demo.pojo.CreateOrderParamVo;
 import com.demo.pojo.QueryOrderParamVo;
 import com.demo.pojo.Student;
 import com.demo.utils.HttpUtil;
-import com.demo.utils.ValidatorUtils;
+import com.demo.validate.hibernate.ValidatorUtils;
 import com.demo.vo.ArrayVo;
 import com.demo.vo.ListParam;
 import com.demo.vo.StudentList;
