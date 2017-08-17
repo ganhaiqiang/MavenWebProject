@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -11,11 +12,19 @@ import net.sf.oval.ConstraintViolation;
 import net.sf.oval.Validator;
 import net.sf.oval.context.FieldContext;
 import net.sf.oval.context.OValContext;
+import net.sf.oval.localization.locale.LocaleProvider;
 
 public final class OvalUtils {
 	private static final Validator VALIDATOR = new Validator();
 
 	private OvalUtils() {
+		Validator.setLocaleProvider(new LocaleProvider() {
+
+			@Override
+			public Locale getLocale() {
+				return Locale.PRC;
+			}
+		});
 	}
 
 	public static <T> List<ValidateResult> validate(T t, String... profiles) {

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import com.demo.vo.ResultUtil;
+
 @ControllerAdvice
 public class BaseController {
 
@@ -32,8 +34,8 @@ public class BaseController {
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ResponseBody
-	public String processUnauthenticatedException(NativeWebRequest request, Exception e) {
-		System.out.println("===========应用到所有@RequestMapping注解的方法，在其抛出UnauthenticatedException异常时执行");
-		return "viewName";
+	public Object processUnauthenticatedException(NativeWebRequest request, Exception e) {
+		System.out.println("===========应用到所有@RequestMapping注解的方法，在其抛出Exception异常时执行");
+		return ResultUtil.error(e.getMessage());
 	}
 }
