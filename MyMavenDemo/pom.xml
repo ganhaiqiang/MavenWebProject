@@ -376,6 +376,45 @@
 							<filtering>true</filtering>
 						</resource>
 					</webResources>
+					<useCache>true</useCache>
+				</configuration>
+				<executions>
+					<execution>
+						<id>prepare-war</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exploded</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>1.5.2</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<file>${project.basedir}/target/${project.artifactId}/1.html</file>
+					<replacements>
+						<replacement>
+							<token><![CDATA[<!-- mergeTo:([^\s]*) -->(.*?)<!-- mergeTo -->]]></token>
+							<value>${href}</value>
+						</replacement>
+					</replacements>
+					<regexFlags>
+						<regexFlag>CASE_INSENSITIVE</regexFlag>
+						<regexFlag>DOTALL</regexFlag>
+					</regexFlags>
+					<regex>true</regex>
+					<!-- <token>{href}</token> -->
+					<!-- <value>${href}</value> -->
 				</configuration>
 			</plugin>
 		</plugins>
@@ -389,18 +428,21 @@
 			</activation>
 			<properties>
 				<package.environment>dev</package.environment>
+				<href>http://www.baidu.com</href>
 			</properties>
 		</profile>
 		<profile>
 			<id>uat</id>
 			<properties>
 				<package.environment>uat</package.environment>
+				<href>http://www.qq.com</href>
 			</properties>
 		</profile>
 		<profile>
 			<id>prod</id>
 			<properties>
 				<package.environment>prod</package.environment>
+				<href>http://www.sina.com</href>
 			</properties>
 		</profile>
 	</profiles>

@@ -3,14 +3,21 @@ package com.demo.aop;
 import java.lang.annotation.Annotation;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Resource;
+
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.HyperLogLogOperations;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import com.demo.cache.CacheKey;
@@ -29,14 +36,22 @@ import com.demo.vo.LogAppender;
 public class CacheableAop {
 	private static final Logger LOGGER = Logger.getLogger(LogAppender.AOP);
 
+	@Resource(name = "redisTemplate")
+	private ValueOperations<String, Object> valueOper;
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
 
 	@Around("@annotation(cache)")
 	public Object cached(final ProceedingJoinPoint pjp, Cacheable cache) throws Throwable {
+//		HashOperations<String, Object, Object> hashOperations = redisTemplate.opsForHash();
+//		HyperLogLogOperations<String, Object> hyperLogLogOperations = redisTemplate.opsForHyperLogLog();
+//		ListOperations<String, Object> listOperations = redisTemplate.opsForList();
+//		SetOperations<String, Object> setOperations = redisTemplate.opsForSet();
+//		ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+//		ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+		
 		String key = getCacheKey(pjp, cache);
 		LOGGER.info("key===>" + key);
-		ValueOperations<String, Object> valueOper = redisTemplate.opsForValue();
 		Object value = null;
 		try {
 			value = valueOper.get(key);
