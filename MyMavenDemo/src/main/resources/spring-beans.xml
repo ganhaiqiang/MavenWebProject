@@ -20,6 +20,8 @@
 	<context:property-placeholder location="classpath:*.properties" />
 
 	<ehcache:annotation-driven cache-manager="ehCacheManager" />
+	
+	<bean class="com.demo.listener.MyHandlerMapping" />
 
 	<bean id="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
 		<property name="configLocation" value="classpath:ehcache.xml" />
@@ -175,7 +177,7 @@
 	</bean>
 
 	<!-- Spring容器启动完毕监听 -->
-	<bean class="com.demo.listener.BeanPostProcessor" />
+	<bean class="com.demo.listener.MyApplicationListener" />
 
 	<!-- 异步线程池 -->
 	<bean id="threadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">

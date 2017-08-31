@@ -9,12 +9,12 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @author 80001267
  *
  */
-public class BeanPostProcessor implements ApplicationListener<ContextRefreshedEvent> {
+public class MyApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		if ("Root WebApplicationContext".equals(event.getApplicationContext().getDisplayName())) {
-			System.out.println("Spring容器启动完毕了。。。。。。。。");
+			System.out.println("MyApplicationListener===>Spring容器启动完毕了。。。。。。。。");
 		}
 	}
 

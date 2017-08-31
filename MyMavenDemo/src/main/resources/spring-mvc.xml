@@ -112,7 +112,7 @@
 		<!-- </mvc:interceptor> -->
 		<mvc:interceptor>
 			<mvc:mapping path="/**" />
-			<mvc:mapping path="/stu/*" />
+<!-- 			<mvc:mapping path="/stu/*" /> -->
 			<beans:bean class="com.demo.interceptor.MyInterceptor" />
 		</mvc:interceptor>
 		<mvc:interceptor>
