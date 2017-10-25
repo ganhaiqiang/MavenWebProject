@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -13,9 +14,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.alibaba.fastjson.JSON;
+
 public class PoiReadExcel {
-	public ArrayList<ArrayList<String>> readExcel(String fileName, String path) {
-		ArrayList<ArrayList<String>> Row = new ArrayList<ArrayList<String>>();
+	public List<List<String>> readExcel(String fileName, String path) {
+		List<List<String>> Row = new ArrayList<List<String>>();
 
 		try {
 			Workbook workBook = null;
@@ -28,6 +31,7 @@ public class PoiReadExcel {
 
 			for (int numSheet = 0; numSheet < workBook.getNumberOfSheets(); numSheet++) {
 				Sheet sheet = workBook.getSheetAt(numSheet);
+				System.out.println("总行数：" + sheet.getLastRowNum());
 				if (sheet == null) {
 					continue;
 				}
@@ -37,7 +41,7 @@ public class PoiReadExcel {
 					if (row == null) {
 						continue;
 					}
-
+					System.out.println("总列数：" + row.getLastCellNum());
 					// 循环列Cell
 					ArrayList<String> arrCell = new ArrayList<String>();
 					for (int cellNum = 0; cellNum <= row.getLastCellNum(); cellNum++) {
@@ -45,6 +49,7 @@ public class PoiReadExcel {
 						if (cell == null) {
 							continue;
 						}
+						cell.setCellType(Cell.CELL_TYPE_STRING);
 						arrCell.add(getValue(cell));
 					}
 					Row.add(arrCell);
@@ -58,25 +63,24 @@ public class PoiReadExcel {
 	}
 
 	private String getValue(Cell cell) {
-		if (cell.getCellType() == cell.CELL_TYPE_BOOLEAN) {
-			return String.valueOf(cell.getBooleanCellValue());
-		} else if (cell.getCellType() == cell.CELL_TYPE_NUMERIC) {
-			return String.valueOf(cell.getNumericCellValue());
-		} else {
-			return String.valueOf(cell.getStringCellValue());
-		}
+		// if (cell.getCellType() == cell.CELL_TYPE_BOOLEAN) {
+		// return String.valueOf(cell.getBooleanCellValue());
+		// } else if (cell.getCellType() == cell.CELL_TYPE_NUMERIC) {
+		// System.out.println(cell.getCellType());
+		// return String.valueOf(cell.getNumericCellValue());
+		// } else {
+		return String.valueOf(cell.getStringCellValue());
+		// }
 	}
 
 	public static void main(String[] args) {
 		PoiReadExcel s = new PoiReadExcel();
 		// ArrayList<ArrayList<String>>
 		// row=s.readExcel("TEST.xlsx","D:\\Program Files\\Java");
-		ArrayList<ArrayList<String>> row = s.readExcel("1.xlsx", "D:\\Program Files\\Java");
+		List<List<String>> row = s.readExcel("js-excel.xlsx", "D:/迅雷下载/");
 		System.out.println("size:" + row.size());
-		for (ArrayList<String> cell : row) {
-			for (String str : cell) {
-				System.out.println(str);
-			}
+		for (List<String> cell : row) {
+			System.out.println(JSON.toJSONString(cell));
 		}
 	}
 }

@@ -106,6 +106,18 @@
 			<td>图书编号</td>
 			<td>借出日期</td>
 		</tr>
+		<tr>
+			<td>100000</td>
+			<td>少年派的奇幻漂流</td>
+			<td>ISN-73245</td>
+			<td>2017-8-2</td>
+		</tr>
+		<tr>
+			<td>123003</td>
+			<td>java技术内幕</td>
+			<td>ISBN-89234</td>
+			<td>2016-11-24</td>
+		</tr>
 	</table>
 	<hr>
 	<input type="button" id="query" value="查询" />

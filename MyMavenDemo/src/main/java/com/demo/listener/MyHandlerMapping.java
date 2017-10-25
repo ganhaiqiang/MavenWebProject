@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import redis.clients.jedis.Jedis;
 
 public class MyHandlerMapping extends RequestMappingHandlerMapping {
-	private static final Jedis JEDIS = new Jedis("127.0.0.1");
+	private static final Jedis JEDIS = new Jedis("127.0.0.1", 6379);
 
 	@Override
 	protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
@@ -23,6 +23,7 @@ public class MyHandlerMapping extends RequestMappingHandlerMapping {
 			map.put(url, "0");
 			System.out.println(url);
 		}
+		JEDIS.auth("admin.123");
 		JEDIS.hmset("urls", map);
 	}
 

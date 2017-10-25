@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -65,7 +66,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 @Controller
 @RequestMapping(value = "/stu")
 public class DemoController {
-	private static final Logger LOGGER = Logger.getLogger(DemoController.class);
+	private static final Logger LOG = Logger.getLogger(DemoController.class);
 	@Autowired
 	private MessageSource messageSource;
 
@@ -261,7 +262,7 @@ public class DemoController {
 				downfilename = new String(fileNames.getBytes("UTF-8"), "iso-8859-1");
 			}
 		} catch (Exception e) {
-			LOGGER.error(e);
+			LOG.error(e);
 		}
 		return downfilename;
 	}
@@ -275,7 +276,7 @@ public class DemoController {
 			return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(new File("D:\\user\\80001267\\Downloads\\doc\\DCN-V6.8.pdf")),
 					headers, HttpStatus.OK);
 		} catch (IOException e) {
-			LOGGER.error("文件不存在：", e);
+			LOG.error("文件不存在：", e);
 			headers.clear();
 			headers.setContentType(MediaType.TEXT_HTML);
 			return new ResponseEntity<byte[]>("文件不存在！可能已被删除或移动。".getBytes("utf-8"), headers, HttpStatus.EXPECTATION_FAILED);
@@ -413,23 +414,25 @@ public class DemoController {
 		String sex = request.getParameter("sex");
 		/************************************************************************/
 		Map map = new HashedMap();
-//		long count = studentService.getCount();
-//		long pageSize = Integer.valueOf(rows);
-//		long total = count % pageSize == 0 ? count / pageSize : count / pageSize + 1;
-//		long pageNo = Integer.valueOf(page);
-//		pageNo = pageNo > total ? total : pageNo;
-//		long pageStart = pageSize * (pageNo - 1);
-//		LOGGER.info("数据总数：" + count + "，页面条数：" + pageSize + "，总页数：" + total + "，当前页码：" + pageNo);
-//		map.put("pageSize", pageSize);
-//		map.put("pageStart", pageStart);
-//		map.put("sidx", sidx);
-//		map.put("sord", sord);
-//		map.put("sex", sex);
-//		List list = studentService.getByPage(map);
-//		map.put("page", pageNo);
-//		map.put("total", total);
-//		map.put("records", count);
-//		map.put("rows", list);
+		// long count = studentService.getCount();
+		// long pageSize = Integer.valueOf(rows);
+		// long total = count % pageSize == 0 ? count / pageSize : count /
+		// pageSize + 1;
+		// long pageNo = Integer.valueOf(page);
+		// pageNo = pageNo > total ? total : pageNo;
+		// long pageStart = pageSize * (pageNo - 1);
+		// LOGGER.info("数据总数：" + count + "，页面条数：" + pageSize + "，总页数：" + total +
+		// "，当前页码：" + pageNo);
+		// map.put("pageSize", pageSize);
+		// map.put("pageStart", pageStart);
+		// map.put("sidx", sidx);
+		// map.put("sord", sord);
+		// map.put("sex", sex);
+		// List list = studentService.getByPage(map);
+		// map.put("page", pageNo);
+		// map.put("total", total);
+		// map.put("records", count);
+		// map.put("rows", list);
 		return map;
 	}
 
@@ -439,9 +442,7 @@ public class DemoController {
 		try {
 			ServletOutputStream out = response.getOutputStream();
 			BufferedImage image = new BufferedImage(750, 30, BufferedImage.TYPE_INT_RGB);
-			int per = 0;
-			per = Integer.parseInt(request.getParameter("size"));// 接收参数，表示进度
-			per = ServletRequestUtils.getIntParameter(request, "size", 0);
+			int per = ServletRequestUtils.getIntParameter(request, "size", 0);// 接收参数，表示进度
 			Graphics graphics = image.getGraphics();
 			graphics.setColor(Color.green);
 			graphics.fillRect(0, 0, 750, 30);
@@ -478,43 +479,35 @@ public class DemoController {
 
 	@RequestMapping(value = "/getBarcode", method = RequestMethod.GET)
 	public void getBarcode(HttpServletRequest request, HttpServletResponse response) {
-		String keycode = request.getParameter("keycode");
-		if (keycode != null && !"".equals(keycode)) {
+		String content = request.getParameter("keycode");
+		if (StringUtils.isNotBlank(content)) {
+			Code128Writer writer = new Code128Writer();
+			int width = 280;
+			int height = 60;
+			String mwidth = request.getParameter("mwidth");
+			if (StringUtils.isNotBlank(mwidth)) {
+				width = Integer.valueOf(mwidth);
+			}
+			String mheight = request.getParameter("mheight");
+			if (StringUtils.isNotBlank(mwidth)) {
+				height = Integer.valueOf(mheight);
+			}
 			ServletOutputStream out = null;
 			try {
-				Code128Writer writer = new Code128Writer();
-				int width = 280;
-				int height = 60;
-				String mwidth = request.getParameter("mwidth");
-				if (mwidth != null && !"".equals(mwidth.trim())) {
-					try {
-						width = Integer.valueOf(mwidth);
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-				}
-				String mheight = request.getParameter("mheight");
-				if (mheight != null && !"".equals(mheight.trim())) {
-					try {
-						height = Integer.valueOf(mheight);
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-				}
 				out = response.getOutputStream();
-				BitMatrix m = writer.encode(keycode, BarcodeFormat.CODE_128, width, height);
-				MatrixToImageWriter.writeToStream(m, "png", out);
-			} catch (WriterException e) {
-				e.printStackTrace();
+				BitMatrix bMatrix = writer.encode(content, BarcodeFormat.CODE_128, width, height);
+				MatrixToImageWriter.writeToStream(bMatrix, "png", out);
+				out.flush();
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
+			} catch (WriterException e) {
+				throw new RuntimeException(e);
 			} finally {
 				if (out != null) {
 					try {
-						out.flush();
 						out.close();
-					} catch (IOException e) {
-						e.printStackTrace();
+					} catch (Exception e2) {
+						LOG.error(e2);
 					}
 				}
 			}
@@ -523,34 +516,30 @@ public class DemoController {
 
 	@RequestMapping(value = "/getBarcode2D", method = RequestMethod.GET)
 	public void getBarcode2D(HttpServletRequest request, HttpServletResponse response) {
-		String keycode = request.getParameter("keycode");
-		if (keycode != null && !"".equals(keycode)) {
+		String content = request.getParameter("keycode");
+		if (StringUtils.isNotBlank(content)) {
 			ServletOutputStream out = null;
+			int size = 140;
+			String msize = request.getParameter("msize");
+			if (StringUtils.isNotBlank(msize)) {
+				size = Integer.valueOf(msize);
+			}
 			try {
-				int size = 140;
-				String msize = request.getParameter("msize");
-				if (msize != null && !"".equals(msize.trim())) {
-					try {
-						size = Integer.valueOf(msize);
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					}
-				}
 				out = response.getOutputStream();
 				QRCodeWriter writer = new QRCodeWriter();
-				BitMatrix m = writer.encode(keycode, BarcodeFormat.QR_CODE, size, size);
+				BitMatrix m = writer.encode(content, BarcodeFormat.QR_CODE, size, size);
 				MatrixToImageWriter.writeToStream(m, "png", out);
-			} catch (WriterException e) {
-				e.printStackTrace();
+				out.flush();
 			} catch (IOException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
+			} catch (WriterException e) {
+				throw new RuntimeException(e);
 			} finally {
 				if (out != null) {
 					try {
-						out.flush();
 						out.close();
-					} catch (IOException e) {
-						e.printStackTrace();
+					} catch (Exception e2) {
+						LOG.error(e2);
 					}
 				}
 			}

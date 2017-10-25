@@ -27,8 +27,8 @@ public class RSATester {
 	// }
 
 	public static void main(String[] args) throws Exception {
-		test();
-		// testSign();
+		// test();
+		testSign();
 	}
 
 	public static String getString(String base64String) {

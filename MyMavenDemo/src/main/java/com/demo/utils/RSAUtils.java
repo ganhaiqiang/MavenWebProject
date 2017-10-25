@@ -435,13 +435,14 @@ public class RSAUtils {
 	}
 
 	public static String sign(String pfxFile, String pfxPwd, String str, String signature, String coding) {
+		FileInputStream fis = null;
 		try {
 			// 获取pfx文件的prikey
 			Security.addProvider(new BouncyCastleProvider());
 			KeyStore e = KeyStore.getInstance("PKCS12", "BC");
-			FileInputStream fis = new FileInputStream(pfxFile);
+			fis = new FileInputStream(pfxFile);
 			e.load(fis, pfxPwd.toCharArray());
-			Enumeration aliases = e.aliases();
+			Enumeration<String> aliases = e.aliases();
 			String keyAlias = null;
 			PrivateKey priKey = null;
 			if (aliases != null) {
@@ -462,11 +463,18 @@ public class RSAUtils {
 			return strSign;
 		} catch (Exception ex) {
 			System.out.println(ex);
+		} finally {
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return null;
 		// System.out.println(sign("C://xxx.pfx","123456","123","MD5withRSA","UTF-8"));
 	}
-
 
 	// cer公钥代码：
 	public void cer(String msg, String check) {

@@ -5,6 +5,9 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -17,6 +20,8 @@ import javax.crypto.Cipher;
 import org.apache.commons.codec.binary.Base64;
 
 public class RSAUtils2 {
+	private static final String UTF_8 = "UTF-8";
+
 	/**
 	 * 加密算法RSA
 	 */
@@ -25,7 +30,8 @@ public class RSAUtils2 {
 	/**
 	 * 签名算法
 	 */
-	public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
+	// public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
+	public static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
 	/**
 	 * 获取公钥的key
@@ -64,6 +70,9 @@ public class RSAUtils2 {
 			byte[] decodedData = decryptByPrivateKey(encodedData, privateKey);
 			String target = new String(decodedData);
 			System.out.println("解密后文字===> " + target);
+			String signString = sign(source, privateKey);
+			System.out.println("签名后：" + signString);
+			System.out.println("验签结果：" + verifySign(source, signString, publicKey));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -80,8 +89,10 @@ public class RSAUtils2 {
 		keyPairGen.initialize(1024);
 		KeyPair keyPair = keyPairGen.generateKeyPair();
 		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+		System.out.println("指数：" + publicKey.getPublicExponent());
+		System.out.println("模数：" + publicKey.getModulus());
 		RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-		Map<String, Object> keyMap = new HashMap<String, Object>(2);
+		Map<String, Object> keyMap = new HashMap<>(2);
 		keyMap.put(PUBLIC_KEY, publicKey);
 		keyMap.put(PRIVATE_KEY, privateKey);
 		return keyMap;
@@ -188,5 +199,49 @@ public class RSAUtils2 {
 		byte[] encryptedData = out.toByteArray();
 		out.close();
 		return encryptedData;
+	}
+
+	/**
+	 * 私钥签名
+	 * 
+	 * @param signStr
+	 * @param privateKey
+	 * @return
+	 * @throws Exception
+	 */
+	public static String sign(String inputStr, String privateKey) throws Exception {
+		byte[] keyBytes = Base64.decodeBase64(privateKey);
+		PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(keyBytes);
+		KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+		PrivateKey privateK = keyFactory.generatePrivate(pkcs8KeySpec);
+		// SHA1withRSA算法进行签名
+		Signature sign = Signature.getInstance(SIGNATURE_ALGORITHM);
+		sign.initSign(privateK);
+		byte[] data = inputStr.getBytes(UTF_8);
+		// 更新用于签名的数据
+		sign.update(data);
+		byte[] signature = sign.sign();
+		return Base64.encodeBase64String(signature);
+	}
+
+	/**
+	 * 公钥验证签名
+	 * 
+	 * @param signStr
+	 * @param privateKey
+	 * @return
+	 * @throws Exception
+	 */
+	public static boolean verifySign(String inputStr, String signStr, String publicKey) throws Exception {
+		byte[] keyBytes = Base64.decodeBase64(publicKey);
+		X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(keyBytes);
+		KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+		PublicKey publicK = keyFactory.generatePublic(x509KeySpec);
+		// SHA1withRSA算法进行验签
+		Signature verifySign = Signature.getInstance(SIGNATURE_ALGORITHM);
+		verifySign.initVerify(publicK);
+		// 用于验签的数据
+		verifySign.update(inputStr.getBytes(UTF_8));
+		return verifySign.verify(Base64.decodeBase64(signStr.getBytes(UTF_8)));
 	}
 }

@@ -1,11 +1,3 @@
-/**
- * =================================================================
- * 版权所有 2011-2013 深圳市泰海网络科技服务有限公司，并保留所有权利
- * -----------------------------------------------------------------
- * 这不是一个自由软件！您不能在任何未经允许的前提下对程序代码进行修改和使用；
- * 不允许对程序代码以任何形式任何目的的再发布
- * =================================================================
- */
 package com.demo.utils;
 
 import java.io.BufferedReader;
@@ -19,124 +11,98 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.http.ParseException;
+import org.apache.log4j.Logger;
 
-/**
- * 类说明：<br>
- * 
- * 
- * <p>
- * 详细描述：<br>
- * 
- * 
- * </p>
- * 
- * @author 顺银收单开发组
- * 
- *         CreateDate: 2013-7-23
- */
+import com.demo.vo.LogAppender;
+
 public final class HttpUtil {
-
+	private static final Logger LOG = Logger.getLogger(LogAppender.HTTP);
 	private static final String CHARSET = "UTF-8";
 
 	/**
-	 * 
-	 * 方法说明：<br>
+	 * POST请求
 	 * 
 	 * @param url
-	 *            请求url
+	 *            请求地址
 	 * @param content
-	 *            post参数 key1=val1&key2=val2&key3=val3
+	 *            参数 key1=val1&key2=val2&key3=val3
 	 * @return
-	 * @throws Exception
 	 */
-	public static String sendByPost(String url, String content) throws Exception {
-		StringBuffer result = new StringBuffer();
-		URL u = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) u.openConnection();
-
-		con.setDoInput(true);
-		con.setDoOutput(true);
-		con.setAllowUserInteraction(false);
-		con.setUseCaches(false);
-		con.setRequestMethod("POST");
-		// con.setRequestProperty("Content-Type",
-		// "application/json;charset=utf-8");
-		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-		con.setConnectTimeout(10000);
-		con.setReadTimeout(20000);
-		OutputStream out = null;
-		BufferedReader reader = null;
+	public static String sendByPost(String url, String content) {
+		StringBuilder result = new StringBuilder();
 		String line = null;
 		try {
-			out = con.getOutputStream();
+			URL u = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) u.openConnection();
+
+			con.setDoInput(true);
+			con.setDoOutput(true);
+			con.setAllowUserInteraction(false);
+			con.setUseCaches(false);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+			con.setConnectTimeout(10000);
+			con.setReadTimeout(20000);
+			OutputStream out = con.getOutputStream();
 			out.write(content.getBytes(CHARSET));
 			out.flush();
 
-			reader = new BufferedReader(new InputStreamReader(con.getInputStream(), CHARSET));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), CHARSET));
 			while (null != (line = reader.readLine())) {
 				result.append(line);
 			}
-		} finally {
-			if (out != null) {
-				out.close();
-			}
-			if (reader != null) {
-				reader.close();
-			}
+			reader.close();
+			out.close();
+		} catch (Exception e) {
+			LOG.error(e);
+			throw new HttpException(e);
 		}
 		return result.toString();
 	}
 
 	/**
-	 * 
-	 * 方法说明：<br>
+	 * GET请求
 	 * 
 	 * @param url
-	 *            请求url
+	 *            请求地址
 	 * @param content
-	 *            get参数 key1=val1&key2=val2&key3=val3
+	 *            参数 key1=val1&key2=val2&key3=val3
 	 * @return
-	 * @throws IOException
 	 */
-	public static String sendByGet(String url, String content) throws IOException {
-		URL u = new URL(url + "?" + content);
-		HttpURLConnection con = (HttpURLConnection) u.openConnection();
-		con.setUseCaches(false);
-		StringBuffer result = new StringBuffer();
-		BufferedReader reader = null;
-		String line = null;
-		reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "GBK"));
-		while (null != (line = reader.readLine())) {
-			result.append(line);
-		}
-		if (reader != null) {
+	public static String sendByGet(String url, String content) {
+		StringBuilder result = new StringBuilder();
+		try {
+			URL u = new URL(url + "?" + content);
+			HttpURLConnection con = (HttpURLConnection) u.openConnection();
+			con.setUseCaches(false);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), CHARSET));
+			String line = null;
+			while (null != (line = reader.readLine())) {
+				result.append(line);
+			}
 			reader.close();
+		} catch (IOException e) {
+			LOG.error(e);
+			throw new HttpException(e);
 		}
 		return result.toString();
 	}
 
 	/**
-	 * 将map拼接成请求字符串，如：key1=val1&key2=val2&key3=val3
+	 * 拼接请求参数，如：key1=val1&key2=val2&key3=val3
 	 * 
 	 * @param map
 	 * @return
-	 * @throws IOException
-	 * @throws ParseException
 	 */
-	public static String splice(Map<String, Object> map) throws ParseException, IOException {
+	public static String splice(Map<String, Object> map) {
 		if (map == null) {
 			return "";
 		}
 		StringBuilder sb = new StringBuilder();
-		int index = 0;
 		for (Entry<String, Object> entry : map.entrySet()) {
-			if (index != 0) {
-				sb.append('&');
-			}
-			sb.append(entry.getKey()).append('=').append(entry.getValue());
-			index++;
+			sb.append(entry.getKey()).append('=').append(entry.getValue()).append('&');
 		}
+		sb.setLength(sb.length() - 1);
 		return sb.toString();
 	}
 
@@ -164,18 +130,15 @@ public final class HttpUtil {
 			}
 
 			if (map.get(str) != null && !"".equals(map.get(str))) {
-				sb.append(str).append('=').append(map.get(str));
-				sb.append('&');
+				sb.append(str).append('=').append(map.get(str)).append('&');
 			}
 		}
 		sb.setLength(sb.length() - 1);
 		return sb.toString();
 	}
 
-	public static void main(String args[]) throws Exception {
-		// String url = "http://localhost:8080/MyDemo/service/param/demo6";
-		String url = "http://memberapp.intsit.sfdc.com.cn:1080/api/redis/cache/v1?param=name%3A123%7Cset%3A789";
-		// String content = "ype=phone&dir_guid=0";
-		System.out.println(HttpUtil.sendByPost(url, ""));// "{\"dts\":[\"2016-09\",\"2016-10\"],\"info\":{\"custCode\":\"7550335485\",\"deptCode\":\"755S\"},\"name\":\"甘海强\"}"));
+	public static void main(String args[]) {
+		String reString = sendByGet("http://www.baidu.com", "");
+		System.out.println(reString);
 	}
 }

@@ -14,6 +14,8 @@ public final class LogAppender {
 	public static final String AOP = "aop";
 	public static final String INTERCEPTOR = "interceptor";
 	public static final String FILTER = "filter";
+	public static final String JOB = "job";
+	public static final String HTTP = "http";
 
 	private LogAppender() {
 	}
