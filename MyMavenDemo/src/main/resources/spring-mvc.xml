@@ -40,11 +40,11 @@
 
 	<beans:bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
 		<beans:property name="providerClass" value="org.hibernate.validator.HibernateValidator" />
-		<!-- 这里配置将使用上面国际化配置的messageSource -->
+		<!-- 这里配置将使用下面国际化配置的messageSource -->
 		<beans:property name="validationMessageSource" ref="messageSource" />
 	</beans:bean>
 
-	<!-- 可以批定文件编码,可以使用classpath: 或者WEB-INF/ 前缀 -->
+	<!-- 可以指定文件编码,可以使用classpath: 或者WEB-INF/ 前缀 -->
 	<!-- <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource"> -->
 	<beans:bean id="messageSource" class="com.demo.message.MultipleMessageSource">
 		<beans:property name="basenames">
@@ -56,6 +56,7 @@
 		</beans:property>
 		<beans:property name="defaultEncoding" value="UTF-8" />
 		<beans:property name="cacheSeconds" value="60" />
+		<beans:property name="useCodeAsDefaultMessage" value="false" />
 	</beans:bean>
 
 	<!-- *************************国际化配置************************* -->

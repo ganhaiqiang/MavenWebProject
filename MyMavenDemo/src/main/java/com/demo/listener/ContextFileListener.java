@@ -1,12 +1,13 @@
 package com.demo.listener;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 public class ContextFileListener implements ApplicationListener<ContextRefreshedEvent> {
-	private static final Logger LOGGER = Logger.getLogger(ContextFileListener.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ContextFileListener.class);
 	@Autowired
 	private FileMonitor fileMonitor;
 
@@ -20,7 +21,7 @@ public class ContextFileListener implements ApplicationListener<ContextRefreshed
 				try {
 					fileMonitor.start();
 				} catch (Exception e) {
-					LOGGER.error(e);
+					LOGGER.error(e.getMessage(), e);
 				}
 			}
 		}, "monitorThread").start();

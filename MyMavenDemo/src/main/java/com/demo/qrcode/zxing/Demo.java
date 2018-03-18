@@ -10,7 +10,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
@@ -28,7 +29,7 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 public class Demo {
-	private static final Logger LOG = Logger.getLogger(Demo.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Demo.class);
 
 	public static void main(String[] args) {
 		String path = "D:/zxing.png";
@@ -76,7 +77,7 @@ public class Demo {
 			Path file = new File(path).toPath();
 			MatrixToImageWriter.writeToPath(bitMatrix, format, file);
 		} catch (WriterException | IOException e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(), e);
 		}
 	}
 
@@ -92,7 +93,7 @@ public class Demo {
 			Result result = formatReader.decode(binaryBitmap, hints);
 			LOG.info("解析结果：" + result.getText());
 		} catch (IOException | NotFoundException e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(), e);
 		}
 	}
 }

@@ -17,7 +17,7 @@
 
 	<context:component-scan base-package="com.demo" />
 	<aop:aspectj-autoproxy />
-	<context:property-placeholder location="classpath:*.properties" />
+	<context:property-placeholder location="classpath:sysconf.properties,classpath:redis.properties,classpath:jdbc.properties,classpath:spring.properties" />
 
 	<ehcache:annotation-driven cache-manager="ehCacheManager" />
 	

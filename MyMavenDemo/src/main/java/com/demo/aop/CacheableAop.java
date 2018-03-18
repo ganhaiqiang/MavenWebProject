@@ -5,11 +5,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
-import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -29,7 +30,7 @@ import com.demo.vo.LogAppender;
 @Aspect
 @Component
 public class CacheableAop {
-	private static final Logger LOGGER = Logger.getLogger(LogAppender.AOP);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LogAppender.AOP);
 
 	@Resource(name = "redisTemplate")
 	private ValueOperations<String, Object> valueOper;
@@ -57,7 +58,7 @@ public class CacheableAop {
 		try {
 			value = valueOper.get(key);
 		} catch (Exception e) {
-			LOGGER.error(e);
+			LOGGER.error(e.getMessage(), e);
 		}
 		if (value == null) {
 			LOGGER.info("缓存为空，重新获取数据");
@@ -69,7 +70,7 @@ public class CacheableAop {
 					valueOper.set(key, value, cache.expire(), TimeUnit.SECONDS);
 				}
 			} catch (Exception e) {
-				LOGGER.error(e);
+				LOGGER.error(e.getMessage(), e);
 			}
 		}
 		return value;

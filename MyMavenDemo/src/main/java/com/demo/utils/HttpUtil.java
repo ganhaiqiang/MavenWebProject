@@ -11,12 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.demo.vo.LogAppender;
 
 public final class HttpUtil {
-	private static final Logger LOG = Logger.getLogger(LogAppender.HTTP);
+	private static final Logger LOG = LoggerFactory.getLogger(LogAppender.HTTP);
 	private static final String CHARSET = "UTF-8";
 
 	/**
@@ -54,7 +55,7 @@ public final class HttpUtil {
 			reader.close();
 			out.close();
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(), e);
 			throw new HttpException(e);
 		}
 		return result.toString();
@@ -82,7 +83,7 @@ public final class HttpUtil {
 			}
 			reader.close();
 		} catch (IOException e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(), e);
 			throw new HttpException(e);
 		}
 		return result.toString();

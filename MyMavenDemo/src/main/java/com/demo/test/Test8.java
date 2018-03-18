@@ -1,14 +1,20 @@
 package com.demo.test;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Period;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.joda.time.DateTime;
+import org.springframework.util.Assert;
+
+import com.alibaba.fastjson.JSON;
 
 public class Test8 {
 	public static void main(String[] args) {
-		BigDecimal bd = new BigDecimal("555.55");
-		System.out.println(bd.longValue());
+		List<List<String>> fList=new LinkedList<>();
+		List<String> cList =new ArrayList<>();
+		cList.add("aaaaaaaaaaa");
+		fList.add(cList);
+		cList.add("bbbbbbbbbb");
+		System.out.println(JSON.toJSONString(fList, true));
 	}
 }

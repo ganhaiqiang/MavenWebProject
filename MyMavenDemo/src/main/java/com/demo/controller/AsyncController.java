@@ -1,19 +1,15 @@
 package com.demo.controller;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.demo.async.TaskExecutorExample;
-
 @Controller
 @RequestMapping(value = "/async")
 public class AsyncController {
-	private static final Logger LOGGER = Logger.getLogger(AsyncController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AsyncController.class);
 //	@Autowired
 //	private TaskExecutorExample taskExecutorExample;
 //	@Autowired

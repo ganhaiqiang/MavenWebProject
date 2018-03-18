@@ -28,8 +28,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -66,9 +68,12 @@ import com.google.zxing.qrcode.QRCodeWriter;
 @Controller
 @RequestMapping(value = "/stu")
 public class DemoController {
-	private static final Logger LOG = Logger.getLogger(DemoController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DemoController.class);
 	@Autowired
 	private MessageSource messageSource;
+
+	@Value("${hessian_server}")
+	private String server;
 
 	@RequestMapping(value = "/getAllUrl", method = RequestMethod.GET)
 	@ResponseBody
@@ -262,7 +267,7 @@ public class DemoController {
 				downfilename = new String(fileNames.getBytes("UTF-8"), "iso-8859-1");
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error(e.getMessage(), e);
 		}
 		return downfilename;
 	}
@@ -390,10 +395,11 @@ public class DemoController {
 		return stuList;
 	}
 
-	@RequestMapping(value = "/test")
+	@RequestMapping(value = "/test", method = RequestMethod.POST)
 	@ResponseBody
 	public String test() {
-		return " hello springMVC";
+		// return SpringProperties.getProperty("hessian_server");
+		return server;
 	}
 
 	@RequestMapping(value = "/error")
@@ -507,7 +513,7 @@ public class DemoController {
 					try {
 						out.close();
 					} catch (Exception e2) {
-						LOG.error(e2);
+						LOG.error(e2.getMessage(), e2);
 					}
 				}
 			}
@@ -539,7 +545,7 @@ public class DemoController {
 					try {
 						out.close();
 					} catch (Exception e2) {
-						LOG.error(e2);
+						LOG.error(e2.getMessage(), e2);
 					}
 				}
 			}
