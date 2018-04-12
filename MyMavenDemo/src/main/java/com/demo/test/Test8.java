@@ -1,20 +1,19 @@
 package com.demo.test;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.util.Properties;
 
-import org.springframework.util.Assert;
-
-import com.alibaba.fastjson.JSON;
+import org.springframework.core.SpringProperties;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class Test8 {
 	public static void main(String[] args) {
-		List<List<String>> fList=new LinkedList<>();
-		List<String> cList =new ArrayList<>();
-		cList.add("aaaaaaaaaaa");
-		fList.add(cList);
-		cList.add("bbbbbbbbbb");
-		System.out.println(JSON.toJSONString(fList, true));
+		try {
+			Properties properties = PropertiesLoaderUtils.loadAllProperties("config.xml");
+			System.out.println(properties.get("email"));
+			System.out.println(SpringProperties.getProperty("hessian_server"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
